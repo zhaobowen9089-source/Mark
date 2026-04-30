@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Mark - 移动端演示</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+    
+    .container {
+      max-width: 480px;
+      margin: 0 auto;
+    }
+    
+    .card {
+      background: white;
+      border-radius: 20px;
+      padding: 30px;
+      margin-bottom: 20px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+    }
+    
+    .header {
+      text-align: center;
+      color: white;
+      margin-bottom: 30px;
+    }
+    
+    .header h1 {
+      font-size: 32px;
+      margin-bottom: 8px;
+    }
+    
+    .header p {
+      opacity: 0.9;
+      font-size: 16px;
+    }
+    
+    .logo-icon {
+      width: 80px;
+      height: 80px;
+      background: white;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      font-size: 40px;
+      color: #667eea;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    }
+    
+    .feature-list {
+      list-style: none;
+    }
+    
+    .feature-item {
+      display: flex;
+      align-items: center;
+      padding: 15px 0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .feature-item:last-child {
+      border-bottom: none;
+    }
+    
+    .feature-icon {
+      width: 44px;
+      height: 44px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 20px;
+      margin-right: 15px;
+    }
+    
+    .feature-info h3 {
+      font-size: 16px;
+      color: #333;
+      margin-bottom: 4px;
+    }
+    
+    .feature-info p {
+      font-size: 13px;
+      color: #999;
+    }
+    
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+      text-align: center;
+    }
+    
+    .stat-item {
+      padding: 15px;
+      background: #f8f9fa;
+      border-radius: 12px;
+    }
+    
+    .stat-value {
+      font-size: 24px;
+      font-weight: bold;
+      color: #667eea;
+    }
+    
+    .stat-label {
+      font-size: 12px;
+      color: #999;
+      margin-top: 4px;
+    }
+    
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+    }
+    
+    .btn:active {
+      transform: translateY(0);
+    }
+    
+    .demo-section {
+      margin-top: 20px;
+    }
+    
+    .demo-item {
+      background: #f8f9fa;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 15px;
+    }
+    
+    .demo-item h4 {
+      font-size: 14px;
+      color: #667eea;
+      margin-bottom: 10px;
+    }
+    
+    .demo-content {
+      font-size: 14px;
+      color: #666;
+      line-height: 1.6;
+    }
+    
+    .status-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 15px;
+      background: white;
+      border-radius: 12px;
+      margin-bottom: 15px;
+    }
+    
+    .status-indicator {
+      width: 8px;
+      height: 8px;
+      background: #10b981;
+      border-radius: 50%;
+      margin-right: 8px;
+    }
+    
+    .status-text {
+      font-size: 14px;
+      color: #333;
+    }
+    
+    .status-time {
+      font-size: 12px;
+      color: #999;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="logo-icon">📱</div>
+      <h1>Mark Demo</h1>
+      <p>移动端演示应用</p>
+    </div>
+    
+    <div class="card">
+      <div class="status-bar">
+        <div style="display: flex; align-items: center;">
+          <div class="status-indicator"></div>
+          <span class="status-text">运行中</span>
+        </div>
+        <span class="status-time" id="currentTime"></span>
+      </div>
+      
+      <div class="stats">
+        <div class="stat-item">
+          <div class="stat-value">256</div>
+          <div class="stat-label">活跃用户</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">1.2k</div>
+          <div class="stat-label">今日访问</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">99%</div>
+          <div class="stat-label">可用性</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="card">
+      <ul class="feature-list">
+        <li class="feature-item">
+          <div class="feature-icon">✨</div>
+          <div class="feature-info">
+            <h3>实时数据展示</h3>
+            <p>动态更新，毫秒级响应</p>
+          </div>
+        </li>
+        <li class="feature-item">
+          <div class="feature-icon">🔒</div>
+          <div class="feature-info">
+            <h3>安全可靠</h3>
+            <p>端到端加密传输</p>
+          </div>
+        </li>
+        <li class="feature-item">
+          <div class="feature-icon">⚡</div>
+          <div class="feature-info">
+            <h3>极速体验</h3>
+            <p>全球 CDN 加速</p>
+          </div>
+        </li>
+        <li class="feature-item">
+          <div class="feature-icon">🌐</div>
+          <div class="feature-info">
+            <h3>内网访问</h3>
+            <p>支持局域网访问</p>
+          </div>
+        </li>
+      </ul>
+    </div>
+    
+    <div class="card">
+      <h3 style="font-size: 16px; color: #333; margin-bottom: 15px;">📋 演示功能</h3>
+      
+      <div class="demo-section">
+        <div class="demo-item">
+          <h4>卡片组件</h4>
+          <div class="demo-content">
+            这是示例卡片内容，支持自定义样式和交互。
+          </div>
+        </div>
+        
+        <div class="demo-item">
+          <h4>进度指示</h4>
+          <div class="demo-content">
+            <div style="background: #e5e7eb; border-radius: 4px; height: 8px; width: 100%;">
+              <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); height: 8px; width: 70%; border-radius: 4px;"></div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="demo-item">
+          <h4>时间戳</h4>
+          <div class="demo-content" id="timestamp"></div>
+        </div>
+      </div>
+      
+      <button class="btn" onclick="refreshData()">🔄 刷新数据</button>
+    </div>
+    
+    <div class="card" style="text-align: center; padding: 20px;">
+      <p style="color: #999; font-size: 12px;">© 2026 Mark Demo | 移动端演示应用</p>
+      <p style="color: #667eea; font-size: 12px; margin-top: 8px;">部署于 CatPaw Cloud</p>
+    </div>
+  </div>
+  
+  <script>
+    function updateTime() {
+      const now = new Date();
+      const timeStr = now.toLocaleString('zh-CN', {
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+      });
+      document.getElementById('currentTime').textContent = timeStr;
+      document.getElementById('timestamp').textContent = '当前时间: ' + timeStr;
+    }
+    
+    function refreshData() {
+      updateTime();
+      const btns = document.querySelectorAll('.btn');
+      btns[0].textContent = '✓ 数据已刷新';
+      setTimeout(() => {
+        btns[0].textContent = '🔄 刷新数据';
+      }, 1500);
+    }
+    
+    updateTime();
+    setInterval(updateTime, 1000);
+  </script>
+</body>
+</html>
