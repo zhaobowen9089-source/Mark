@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>个人足迹页</title>
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
+  background: #f5f5f5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.phone-frame {
+  width: 375px;
+  height: 812px;
+  background: #fff;
+  position: relative;
+  overflow: hidden;
+  border-radius: 40px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+}
+
+/* 状态栏 */
+.status-bar {
+  height: 44px;
+  padding: 14px 20px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  z-index: 10;
+}
+
+.status-bar .time {
+  font-size: 15px;
+  font-weight: 600;
+  color: #333;
+}
+
+.status-bar .icons {
+  font-size: 12px;
+  color: #333;
+}
+
+/* 顶部切换 */
+.tab-bar {
+  display: flex;
+  justify-content: center;
+  gap: 0;
+  padding: 12px 20px 0;
+  position: relative;
+  z-index: 10;
+}
+
+.tab-item {
+  padding: 8px 24px;
+  font-size: 14px;
+  color: #999;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+}
+
+.tab-item.active {
+  color: #333;
+  font-weight: 500;
+  border-bottom: 2px solid #FF6633;
+}
+
+
+/* 地图区域 */
+.map-area {
+  position: absolute;
+  top: 120px;
+  left: 0;
+  right: 0;
+  bottom: 320px;
+  background: #E8F4E8;
+  overflow: visible;
+}
+
+/* 模拟地图底色 */
+.map-area::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    linear-gradient(135deg, #E8F0E4 0%, #F0F4EC 50%, #E4ECE0 100%);
+}
+
+/* 模拟道路 */
+.road {
+  position: absolute;
+  background: #fff;
+  border-radius: 2px;
+}
+
+.road-h1 { top: 35%; left: 0; right: 0; height: 3px; }
+.road-h2 { top: 60%; left: 0; right: 0; height: 2px; }
+.road-v1 { top: 0; bottom: 0; left: 30%; width: 3px; }
+.road-v2 { top: 0; bottom: 0; left: 65%; width: 2px; }
+
+/* 热力区域 */
+.heat-zone {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 102, 51, 0.08);
+}
+
+.heat-zone-1 {
+  width: 140px;
+  height: 140px;
+  top: 20%;
+  left: 15%;
+}
+
+.heat-zone-2 {
+  width: 100px;
+  height: 100px;
+  top: 45%;
+  left: 50%;
+}
+
+/* 打卡点位 */
+.poi-dot {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #FF6633;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(255, 102, 51, 0.4);
+}
+
+.poi-dot.large {
+  width: 32px;
+  height: 32px;
+  font-size: 11px;
+  box-shadow: 0 2px 12px rgba(255, 102, 51, 0.5), 0 0 0 4px rgba(255, 102, 51, 0.15);
+}
+
+.poi-dot.medium {
+  width: 26px;
+  height: 26px;
+}
+
+.poi-dot.small {
+  width: 20px;
+  height: 20px;
+  font-size: 9px;
+}
+
+.dot-1 { top: 28%; left: 25%; }
+.dot-2 { top: 38%; left: 42%; }
+.dot-3 { top: 52%; left: 58%; }
+.dot-4 { top: 22%; left: 55%; }
+.dot-5 { top: 65%; left: 30%; }
+.dot-6 { top: 45%; left: 20%; }
+
+/* 点位标签 */
+.poi-label {
+  position: absolute;
+  background: #fff;
+  padding: 3px 8px;
+  border-radius: 10px;
+  font-size: 10px;
+  color: #333;
+  white-space: nowrap;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+}
+
+.label-1 { top: 22%; left: 32%; }
+.label-2 { top: 48%; left: 63%; }
+
+/* 好友地图标记 */
+.friend-marker {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  z-index: 3;
+}
+
+.friend-marker .friend-avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #E8E8E8;
+  border: 2px solid #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
+.friend-marker .friend-avatar.online {
+  border-color: #4CD964;
+}
+
+.friend-marker .friend-tip {
+  background: #fff;
+  padding: 3px 8px;
+  border-radius: 10px;
+  font-size: 10px;
+  color: #666;
+  white-space: nowrap;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+}
+
+.friend-marker .friend-tip .tip-time {
+  color: #BBB;
+}
+
+.friend-1 { top: 15%; left: 65%; }
+.friend-2 { top: 70%; left: 18%; }
+
+/* 成就入口 */
+.achievement-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 36px;
+  height: 36px;
+  background: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  font-size: 16px;
+  z-index: 5;
+}
+
+/* 当前位置标记（蓝色脉冲圈） */
+.current-location {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #4A90D9;
+  border: 3px solid #fff;
+  box-shadow: 0 0 0 8px rgba(74, 144, 217, 0.15), 0 0 0 16px rgba(74, 144, 217, 0.06);
+  z-index: 4;
+}
+
+.current-dot { top: 45%; left: 44%; }
+
+/* 当前位置信息卡片 */
+.location-card {
+  position: absolute;
+  top: 30%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #fff;
+  border-radius: 12px;
+  padding: 10px 14px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+  width: 200px;
+  z-index: 6;
+}
+
+.location-card::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 12px;
+  height: 12px;
+  background: #fff;
+  border-radius: 2px;
+  transform: translateX(-50%) rotate(45deg);
+  box-shadow: 2px 2px 4px rgba(0,0,0,0.05);
+}
+
+.location-card .loc-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 4px;
+}
+
+.location-card .loc-history {
+  font-size: 11px;
+  color: #999;
+  margin-bottom: 8px;
+}
+
+.location-card .loc-last {
+  font-size: 11px;
+  color: #BBB;
+  margin-bottom: 10px;
+}
+
+.location-card .loc-action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 6px 0;
+  background: #FF6633;
+  color: #fff;
+  border-radius: 14px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+/* 一键打卡按钮 */
+.checkin-fab {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 20px;
+  background: #FF6633;
+  color: #fff;
+  border-radius: 22px;
+  box-shadow: 0 4px 16px rgba(255, 102, 51, 0.4);
+  font-size: 13px;
+  font-weight: 500;
+  z-index: 5;
+  cursor: pointer;
+}
+
+.checkin-fab .fab-icon {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+}
+
+.checkin-fab .fab-location {
+  font-size: 11px;
+  opacity: 0.85;
+  margin-left: 2px;
+}
+
+/* 轻量汇总 */
+.summary-section {
+  padding: 16px 20px 12px;
+  border-bottom: 1px solid #F5F5F5;
+}
+
+.summary-line {
+  font-size: 13px;
+  color: #999;
+}
+
+/* 即将解锁提示（地图内浮层） */
+.unlock-hint {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  right: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+  z-index: 6;
+  backdrop-filter: blur(8px);
+}
+
+/* 未解锁POI推荐点位（虚线圈） */
+.poi-recommend {
+  position: absolute;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 2px dashed #FF6633;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  color: #FF6633;
+  background: rgba(255, 102, 51, 0.06);
+  z-index: 3;
+}
+
+.recommend-pos { top: 60%; left: 72%; }
+
+.unlock-hint .unlock-icon {
+  font-size: 20px;
+  flex-shrink: 0;
+  opacity: 0.5;
+}
+
+.unlock-hint .unlock-text {
+  flex: 1;
+  font-size: 12px;
+  color: #666;
+  line-height: 1.4;
+}
+
+.unlock-hint .unlock-text .highlight {
+  color: #FF6633;
+  font-weight: 500;
+}
+
+.unlock-hint .unlock-progress {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.unlock-hint .progress-bar {
+  width: 48px;
+  height: 4px;
+  background: #F0E0D6;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.unlock-hint .progress-bar .progress-fill {
+  height: 100%;
+  background: #FF6633;
+  border-radius: 2px;
+}
+
+.unlock-hint .progress-text {
+  font-size: 10px;
+  color: #BBB;
+}
+
+/* 底部卡片区 */
+.card-area {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 320px;
+  background: #fff;
+  border-radius: 16px 16px 0 0;
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.06);
+  padding: 0 0 34px;
+  overflow-y: auto;
+}
+
+
+/* 主题合集（类iPhone相册风格） */
+.albums-section {
+  margin-bottom: 16px;
+  padding: 0 20px;
+  flex-shrink: 0;
+}
+
+.albums-title {
+  font-size: 13px;
+  color: #999;
+  margin-bottom: 10px;
+}
+
+.albums-grid {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.albums-grid::-webkit-scrollbar {
+  display: none;
+}
+
+.album-card {
+  width: 100px;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.album-cover {
+  width: 100px;
+  height: 100px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  margin-bottom: 6px;
+  position: relative;
+  overflow: hidden;
+}
+
+.album-cover .album-count {
+  position: absolute;
+  bottom: 6px;
+  right: 6px;
+  background: rgba(0,0,0,0.5);
+  color: #fff;
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 8px;
+}
+
+.album-name {
+  font-size: 12px;
+  color: #333;
+  text-align: center;
+}
+
+/* 足迹卡片 */
+.footprint-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 20px;
+  border-bottom: 1px solid #F5F5F5;
+}
+
+.footprint-card:last-child {
+  border-bottom: none;
+}
+
+/* 左侧情绪图标 */
+.card-mood {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #F8F8F8;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 17px;
+}
+
+.card-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 3px;
+}
+
+/* 第一层：场景 + 情绪（最突出） */
+.card-scene {
+  font-size: 14px;
+  color: #333;
+  font-weight: 500;
+}
+
+/* 第二层：时间 + 人物 */
+.card-meta {
+  font-size: 12px;
+  color: #999;
+}
+
+/* 最近印象 */
+.recent-section {
+  padding: 0 20px;
+}
+
+.recent-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.recent-title {
+  font-size: 13px;
+  color: #999;
+}
+
+.recent-more {
+  font-size: 12px;
+  color: #999;
+}
+
+.recent-section .footprint-card {
+  padding: 12px 0;
+}
+
+/* 里程碑样式 */
+.footprint-card.milestone {
+  background: linear-gradient(135deg, #FFFBF5 0%, #FFF8F0 100%);
+  border-radius: 12px;
+  margin: 0 12px;
+  padding: 14px 16px;
+  border-bottom: none;
+  border: 1px solid #FFE8D9;
+}
+
+.card-milestone-badge {
+  font-size: 10px;
+  color: #FF6633;
+  font-weight: 600;
+  padding: 2px 8px;
+  background: #FFE8D9;
+  border-radius: 8px;
+  display: inline-block;
+  margin-bottom: 2px;
+}
+
+/* 好友足迹重合 */
+.social-section {
+  margin-top: 16px;
+  padding: 16px 20px 0;
+  border-top: 1px solid #F0F0F0;
+}
+
+.social-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.social-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+}
+
+.social-more {
+  font-size: 12px;
+  color: #999;
+}
+
+/* 横滑卡片容器 */
+.friend-cards-scroll {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  margin: 0 -20px;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+.friend-cards-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.friend-overlap-card {
+  width: 130px;
+  flex-shrink: 0;
+  background: #FAFAFA;
+  border-radius: 14px;
+  padding: 14px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  border: 1px solid #F0F0F0;
+}
+
+.fo-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #F0F0F0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  margin-bottom: 2px;
+}
+
+.fo-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: #333;
+}
+
+.fo-stat {
+  font-size: 11px;
+  color: #999;
+}
+
+.fo-stat .fo-highlight {
+  color: #FF6633;
+  font-weight: 600;
+}
+
+.fo-detail {
+  font-size: 10px;
+  color: #BBB;
+  text-align: center;
+  line-height: 1.3;
+  margin-top: 2px;
+}
+
+.fo-action {
+  margin-top: 8px;
+  font-size: 11px;
+  color: #FF6633;
+  font-weight: 500;
+  cursor: pointer;
+}
+</style>
+</head>
+<body>
+
+<div class="phone-frame">
+  <!-- 状态栏 -->
+  <div class="status-bar">
+    <span class="time">12:29</span>
+    <span class="icons">📶 🔋</span>
+  </div>
+
+  <!-- 顶部切换 -->
+  <div class="tab-bar">
+    <div class="tab-item">附近</div>
+    <div class="tab-item active">我的足迹</div>
+  </div>
+
+
+  <!-- 地图区域 -->
+  <div class="map-area">
+    <!-- 模拟道路 -->
+    <div class="road road-h1"></div>
+    <div class="road road-h2"></div>
+    <div class="road road-v1"></div>
+    <div class="road road-v2"></div>
+
+    <!-- 热力区域 -->
+    <div class="heat-zone heat-zone-1"></div>
+    <div class="heat-zone heat-zone-2"></div>
+
+    <!-- 打卡点位 -->
+    <div class="poi-dot large dot-1">8</div>
+    <div class="poi-dot medium dot-2">4</div>
+    <div class="poi-dot medium dot-3">5</div>
+    <div class="poi-dot small dot-4">2</div>
+    <div class="poi-dot small dot-5">1</div>
+    <div class="poi-dot small dot-6">3</div>
+
+    <!-- 点位标签 -->
+    <div class="poi-label label-1">佬太公海鸭</div>
+    <div class="poi-label label-2">铁手咖啡</div>
+
+    <!-- 好友标记（在附近/近期打卡过） -->
+    <div class="friend-marker friend-1">
+      <div class="friend-avatar online">👦</div>
+      <div class="friend-tip">小明 · <span class="tip-time">在附近</span></div>
+    </div>
+    <div class="friend-marker friend-2">
+      <div class="friend-avatar">👩</div>
+      <div class="friend-tip">小红 · <span class="tip-time">2小时前</span></div>
+    </div>
+
+    <!-- 当前位置（蓝色脉冲点） -->
+    <div class="current-location current-dot"></div>
+
+    <!-- 当前位置信息卡片 -->
+    <div class="location-card">
+      <div class="loc-name">佬太公海鸭 · 海鲜大排档</div>
+      <div class="loc-history">已来过 8 次 · 上次 3天前</div>
+      <div class="loc-last">上次标签：好吃、会回购</div>
+      <div class="loc-action">✓ 打卡 · 周五聚餐</div>
+    </div>
+
+    <!-- 未解锁的推荐POI（虚线圈） -->
+    <div class="poi-recommend recommend-pos">🍸</div>
+
+    <!-- 即将解锁提示（地图底部浮层） -->
+    <div class="unlock-hint">
+      <span class="unlock-icon">🍸</span>
+      <div class="unlock-text">已解锁 3 家酒吧，附近还有 <span class="highlight">1 家未去过</span>的精品酒吧，再解锁 2 家即可达成「夜生活家」</div>
+      <div class="unlock-progress">
+        <div class="progress-bar"><div class="progress-fill" style="width: 60%;"></div></div>
+        <span class="progress-text">3/5</span>
+      </div>
+    </div>
+
+    <!-- 成就入口 -->
+    <div class="achievement-btn">🏆</div>
+  </div>
+
+  <!-- 底部卡片区 -->
+  <div class="card-area">
+    <!-- 轻量汇总 -->
+    <div class="summary-section">
+      <div class="summary-line">5月已打卡 8 次 · 最常去铁手咖啡 · 解锁了 2 家新店</div>
+    </div>
+
+    <!-- 主题合集 -->
+    <div class="albums-section">
+      <div class="albums-grid">
+        <div class="album-card">
+          <div class="album-cover" style="background: linear-gradient(135deg, #FFE0B2, #FFCC80);">
+            🍻
+            <span class="album-count">18</span>
+          </div>
+          <div class="album-name">聚餐</div>
+        </div>
+        <div class="album-card">
+          <div class="album-cover" style="background: linear-gradient(135deg, #E1BEE7, #CE93D8);">
+            🌙
+            <span class="album-count">12</span>
+          </div>
+          <div class="album-name">加班</div>
+        </div>
+        <div class="album-card">
+          <div class="album-cover" style="background: linear-gradient(135deg, #B2EBF2, #80DEEA);">
+            ☀️
+            <span class="album-count">9</span>
+          </div>
+          <div class="album-name">周末</div>
+        </div>
+        <div class="album-card">
+          <div class="album-cover" style="background: linear-gradient(135deg, #C8E6C9, #A5D6A7);">
+            ✈️
+            <span class="album-count">5</span>
+          </div>
+          <div class="album-name">旅行</div>
+        </div>
+        <div class="album-card">
+          <div class="album-cover" style="background: linear-gradient(135deg, #F0F0F0, #E0E0E0);">
+            🎧
+            <span class="album-count">3</span>
+          </div>
+          <div class="album-name">独处</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 最近印象（预览，非完整列表） -->
+    <div class="recent-section">
+      <div class="recent-header">
+        <span class="recent-title">最近印象</span>
+        <span class="recent-more">全部时间线 ›</span>
+      </div>
+
+      <div class="footprint-card">
+        <div class="card-mood">🍻</div>
+        <div class="card-content">
+          <div class="card-scene">大晴天，和同事吃了顿海鲜，聊得很开心</div>
+          <div class="card-meta">今天 12:15 · 佬太公海鸭 · 32°C</div>
+        </div>
+      </div>
+
+      <div class="footprint-card">
+        <div class="card-mood">☕</div>
+        <div class="card-content">
+          <div class="card-scene">外面下着雨，窝在咖啡店里发了会儿呆</div>
+          <div class="card-meta">昨天 · 铁手咖啡 · 小雨</div>
+        </div>
+      </div>
+
+      <div class="footprint-card milestone">
+        <div class="card-mood">✨</div>
+        <div class="card-content">
+          <div class="card-milestone-badge">第 1 次探店</div>
+          <div class="card-scene">和小红发现了一家宝藏冰淇淋店</div>
+          <div class="card-meta">周六 · Luneurs 冰淇淋 · 多云</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 好友足迹重合（横滑卡片） -->
+    <div class="social-section">
+      <div class="social-header">
+        <span class="social-title">和好友的交集</span>
+        <span class="social-more">更多 ›</span>
+      </div>
+
+      <div class="friend-cards-scroll">
+        <div class="friend-overlap-card">
+          <div class="fo-avatar">👦</div>
+          <div class="fo-name">小明</div>
+          <div class="fo-stat">同去 <span class="fo-highlight">5</span> 家店</div>
+          <div class="fo-detail">铁手咖啡 · 你4次 ta2次</div>
+          <div class="fo-action">一起去 →</div>
+        </div>
+        <div class="friend-overlap-card">
+          <div class="fo-avatar">👩</div>
+          <div class="fo-name">小红</div>
+          <div class="fo-stat">同去 <span class="fo-highlight">3</span> 家店</div>
+          <div class="fo-detail">佬太公 · 你们都是常客</div>
+          <div class="fo-action">一起去 →</div>
+        </div>
+        <div class="friend-overlap-card">
+          <div class="fo-avatar">🧑</div>
+          <div class="fo-name">阿杰</div>
+          <div class="fo-stat">同去 <span class="fo-highlight">2</span> 家店</div>
+          <div class="fo-detail">最近都在探酒吧</div>
+          <div class="fo-action">一起去 →</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
