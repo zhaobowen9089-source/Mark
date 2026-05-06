@@ -5532,24 +5532,28 @@
 
     let _expandOpen = false;
     let _expandDone = false;
+    let _expandCardRect = null;
 
     function handleCheckin() {
       if (_expandOpen) return;
       const card = document.getElementById('checkinCard');
       const overlay = document.getElementById('expandOverlay');
-      const container = document.querySelector('.content');
+      const wrapperEl = document.getElementById('scaleWrapper');
 
-      // Measure card position relative to .content
+      // scale-wrapper has transform:scale() — convert viewport rects to wrapper-local coords
+      const wrapperRect = wrapperEl.getBoundingClientRect();
+      const scale = wrapperRect.width / wrapperEl.offsetWidth || 1;
+
       const cardRect = card.getBoundingClientRect();
-      const containerRect = container.getBoundingClientRect();
-      const x = cardRect.left - containerRect.left;
-      const y = cardRect.top  - containerRect.top;
-      const w = cardRect.width;
-      const h = cardRect.height;
+      const x = (cardRect.left - wrapperRect.left) / scale;
+      const y = (cardRect.top  - wrapperRect.top)  / scale;
+      const w = cardRect.width  / scale;
+      const h = cardRect.height / scale;
+      _expandCardRect = { x, y, w, h };
 
-      // Target: full width, same height as card, top-aligned with card
-      const targetX = 0;
-      const targetW = containerRect.width;
+      // Target: exact phone-frame width (FRAME_W=393), top-aligned with card
+      const targetX = (wrapperRect.left - wrapperRect.left) / scale; // always 0
+      const targetW = FRAME_W;
       const targetH = h;
       const targetY = y;
 
@@ -5643,16 +5647,9 @@
 
     function collapseCheckin() {
       if (!_expandOpen) return;
-      const card = document.getElementById('checkinCard');
+      clearTimeout(window._eoAutoCollapseTimer);
       const overlay = document.getElementById('expandOverlay');
-      const container = document.querySelector('.content');
-
-      const cardRect = card.getBoundingClientRect();
-      const containerRect = container.getBoundingClientRect();
-      const x = cardRect.left - containerRect.left;
-      const y = cardRect.top  - containerRect.top;
-      const w = cardRect.width;
-      const h = cardRect.height;
+      const { x, y, w, h } = _expandCardRect;
 
       overlay.classList.remove('open');
       overlay.classList.add('animating');
