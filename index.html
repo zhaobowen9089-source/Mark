@@ -5762,6 +5762,39 @@
       }
     }
 
+    // ── 打卡成就区鼠标横滑 ───────────────────────────────────────────────────
+    ;(function() {
+      const el = document.querySelector('.profile-checkin-scroll');
+      if (!el) return;
+      let _down = false, _startX = 0, _scrollLeft = 0, _moved = false;
+
+      el.addEventListener('mousedown', (e) => {
+        _down = true; _moved = false;
+        _startX = e.pageX - el.offsetLeft;
+        _scrollLeft = el.scrollLeft;
+        el.style.cursor = 'grabbing';
+        e.preventDefault();
+      });
+
+      document.addEventListener('mousemove', (e) => {
+        if (!_down) return;
+        const x = e.pageX - el.offsetLeft;
+        const dist = x - _startX;
+        if (Math.abs(dist) > 4) _moved = true;
+        el.scrollLeft = _scrollLeft - dist;
+      });
+
+      document.addEventListener('mouseup', () => {
+        if (!_down) return;
+        _down = false;
+        el.style.cursor = '';
+      });
+
+      el.addEventListener('click', (e) => {
+        if (_moved) { _moved = false; e.stopPropagation(); }
+      });
+    })();
+
     // ─── SVG Illustrations ────────────────────────────────────────────────────
     // Each returns an inline SVG string filling a square viewport 200×200
 
